@@ -89,7 +89,7 @@ function libraryNameSuggestedAccept() {
  * an underscore (as it's a word character), and replace it with a dash
  */
 function libraryNameSuggested() {
-  return path.basename(__dirname + '../../')
+  return path.basename(path.resolve(__dirname, '..'))
              .replace(/[^\w\d]|_/g, '-')
              .toLowerCase()
 }
