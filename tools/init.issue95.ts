@@ -20,7 +20,6 @@ if (!which('git')) {
 /// Helper variables
 ///
 
-let inCI = process.env.CI
 let username = exec('git config user.name').stdout.trim()
 let usermail = exec('git config user.email').stdout.trim()
 
@@ -32,6 +31,14 @@ let usermail = exec('git config user.email').stdout.trim()
 
 function resolve(p: any) {
   return path.resolve(__dirname, '..', p)
+}
+
+function inCI() {
+  if (process.env.CI == null) {
+    return false
+  }
+
+  return true
 }
 
 
@@ -163,5 +170,5 @@ for (let i = 0; i < lines; i++) {
 console.log(colors.cyan("Hi! You're almost ready to make the next great TypeScript library."))
 
 // Generate the library name
-let libraryName = libraryNameSet(inCI)
+let libraryName = libraryNameSet(inCI())
 console.log(colors.green('The library is going to be called: '+libraryName))
