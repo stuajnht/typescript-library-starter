@@ -20,6 +20,7 @@ if (!which('git')) {
 /// Helper variables
 ///
 
+let libraryName = 'test' // Default, in case this is running in a CI environment
 let username = exec('git config user.name').stdout.trim()
 let usermail = exec('git config user.email').stdout.trim()
 
@@ -47,55 +48,36 @@ function inCI() {
 /// Library Name functions
 ///
 
-/**
- * Sets the library name to be used for generating the files
- * 
- * This function works in this way:
- * ```
- * If running in a CI environment, the library name is 'test'
- * If the suggested library name isn't "typescript-library-starter"
- *  Ask the if they are happy with the suggested library name
- *    Return suggested name
- * Ask for the library name and return it
- * ```
- * @param usingCI
- */
-function libraryNameSet(usingCI: boolean) {
-  if (!usingCI) {
-    if (!suggestedLibraryNameIsDefault() && suggestedLibraryNameAccepted()) {
-      return suggestedLibraryName()
+function libraryNameCreate() {
+  _prompt.get(_promptSchemaLibraryName, (err: any, res: any) => {
+    if (err) {
+      console.log(colors.red('Sorry, there was an error building the workspace :('))
+      process.exit(1)
+      return
     }
 
-    _prompt.get(_promptSchemaLibraryName, (err: any, res: any) => {
-      if (err) {
-        console.log(colors.red('There was an error building the workspace :('))
-        process.exit(1)
-        return
-      }
-  
-      return res.library
-    })
-  }
-  
-  return 'test' // This is the default when running inside CI infrastructure
+    libraryName = res.library
+    processLibraryProject()
+  })
 }
 
 /**
- * Sees if the users wants to use the suggested library name if the project
+ * Sees if the users wants to accept the suggested library name if the project
  * has been cloned into a custom directory (i.e. it's not 'typescript-library-starter')
  */
-function suggestedLibraryNameAccepted() {
+function libraryNameSuggestedAccept() {
   _prompt.get(_promptSchemaLibrarySuggest, (err: any, res: any) => {
     if (err) {
       console.log(colors.red("Sorry, you'll need to type the library name"))
-      return false
+      libraryNameCreate()
     }
 
     if (res.useSuggestedName.toLowerCase() == 'yes') {
-      return true
+      libraryName = libraryNameSuggested()
+      processLibraryProject()
+    } else {
+      libraryNameCreate()
     }
-
-    return false
   })
 }
 
@@ -106,7 +88,7 @@ function suggestedLibraryNameAccepted() {
  * The regex for this looks for any non-word or non-digit character, or
  * an underscore (as it's a word character), and replace it with a dash
  */
-function suggestedLibraryName() {
+function libraryNameSuggested() {
   return path.basename(__dirname + '../../')
              .replace(/[^\w\d]|_/g, '-')
              .toLowerCase()
@@ -116,7 +98,7 @@ function suggestedLibraryName() {
  * This checks if the suggested library name is the default, which
  * is 'typescript-library-starter'
  */
-function suggestedLibraryNameIsDefault() {
+function libraryNameSuggestedIsDefault() {
   if (suggestedLibraryName() == 'typescript-library-starter') {
     return true
   }
@@ -127,12 +109,22 @@ function suggestedLibraryNameIsDefault() {
 
 
 ///
+/// Setup library
+///
+
+function processLibraryProject() {
+  console.log(colors.green('This library is called: '+libraryName))
+}
+
+
+
+///
 /// Questions for the user
 ///
 const _promptSchemaLibraryName = {
   properties: {
     library: {
-      description: colors.cyan("What do you want the library to be called (kebab-case):"),
+      description: colors.cyan("What do you want the library to be called (use kebab-case)"),
       pattern: /^[a-z]+(\-[a-z]+)*$/,
       type: 'string',
       required: true,
@@ -143,7 +135,7 @@ const _promptSchemaLibraryName = {
 const _promptSchemaLibrarySuggest = {
   properties: {
     useSuggestedName: {
-      description: colors.cyan('Would you like it to be called "'+suggestedLibraryName()+'"? [Yes/No]:'),
+      description: colors.cyan('Would you like it to be called "'+libraryNameSuggested()+'"? [Yes/No]'),
       pattern: /^(yes|no)$/i,
       type: 'string',
       required: true,
@@ -169,6 +161,14 @@ for (let i = 0; i < lines; i++) {
 // Say hi!
 console.log(colors.cyan("Hi! You're almost ready to make the next great TypeScript library."))
 
-// Generate the library name
-let libraryName = libraryNameSet(inCI())
-console.log(colors.green('The library is going to be called: '+libraryName))
+// Generate the library name and start the tasks
+if (!inCI()) {
+  if (!libraryNameSuggestedIsDefault()) {
+    libraryNameSuggestedAccept()
+  } else {
+    libraryNameCreate()
+  }
+} else {
+  // This is being run in a CI environment, so don't ask any questions
+  processLibraryProject()
+}
