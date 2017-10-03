@@ -99,7 +99,7 @@ function libraryNameSuggested() {
  * is 'typescript-library-starter'
  */
 function libraryNameSuggestedIsDefault() {
-  if (suggestedLibraryName() == 'typescript-library-starter') {
+  if (libraryNameSuggested() == 'typescript-library-starter') {
     return true
   }
 
