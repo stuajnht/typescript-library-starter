@@ -86,11 +86,14 @@ function libraryNameSuggestedAccept() {
  * tools parent directory and converting it to kebab-case
  * 
  * The regex for this looks for any non-word or non-digit character, or
- * an underscore (as it's a word character), and replace it with a dash
+ * an underscore (as it's a word character), and replace it with a dash.
+ * Any leading or trailing dashes are then removed, before the string is
+ * lowercased and returned
  */
 function libraryNameSuggested() {
   return path.basename(path.resolve(__dirname, '..'))
              .replace(/[^\w\d]|_/g, '-')
+             .replace(/^-+|-+$/g, '')
              .toLowerCase()
 }
 
