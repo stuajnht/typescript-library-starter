@@ -32,6 +32,7 @@ let usermail = exec('git config user.email').stdout.trim()
 
 // These are all relative to the project root directory
 const rmItems = ['.git/*', 'tools/init.ts', '.all-contributorsrc', '.gitattributes']
+const modifyFiles = ['package.json', 'rollup.config.ts', 'LICENSE', 'test/library.test.ts', 'tools/gh-pages-publish.ts']
 
 
 
@@ -128,13 +129,32 @@ function processLibraryProject() {
   console.log(colors.cyan("\nThanks for that. The last few changes are being made... hang tight!\n\n"))
 
   removeItems()
+
+  modifyContents()
 }
 
 function removeItems() {
-  console.log(colors.underline.white('Removed'));
+  console.log(colors.underline.white('Removed'))
   
   rm('-rf', rmItems.map(f => path.resolve(__dirname, '..', f)))
   console.log(colors.red(rmItems.join("\n")))
+}
+
+function modifyContents() {
+  console.log(colors.underline.white('Modified'))
+
+  let files = modifyFiles.map(f => path.resolve(__dirname, '..', f))
+  try {
+    const changes = replace.sync({
+      files,
+      from: [/--libraryname--/g, /--username--/g, /--usermail--/g],
+      to: [libraryName, username, usermail],
+    })
+    console.log(colors.yellow(modifyFiles.join("\n")))
+  }
+  catch (error) {
+    console.error('Error occurred:', error);
+  }
 }
 
 
