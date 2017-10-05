@@ -27,6 +27,16 @@ let usermail = exec('git config user.email').stdout.trim()
 
 
 ///
+/// Files / directories to be changed
+///
+
+// These are all relative to the project root directory
+const rmDirs = ['.git']
+const rmFiles = ['tools/init.ts', '.all-contributorsrc', '.gitattributes']
+
+
+
+///
 /// Helper functions
 ///
 
@@ -116,7 +126,21 @@ function libraryNameSuggestedIsDefault() {
 ///
 
 function processLibraryProject() {
-  console.log(colors.green('This library is called: '+libraryName))
+  console.log(colors.cyan("\nThanks for that. The last few changes are being made... hang tight!\n\n"))
+
+  removeItems()
+}
+
+function removeItems() {
+  console.log(colors.underline.white('Removed'));
+  
+  let dirs = rmDirs.map(f => path.resolve(__dirname, '..', f))
+  rm('-rf', dirs)
+  console.log(colors.red(rmDirs.join("\n")))
+
+  let files = rmFiles.map(f => path.resolve(__dirname, '..', f))
+  rm(files)
+  console.log(colors.red(rmFiles.join("\n")))
 }
 
 
