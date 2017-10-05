@@ -151,6 +151,8 @@ function processLibraryProject() {
   modifyContents()
 
   renameItems()
+
+  finalize()
 }
 
 function removeItems() {
@@ -195,6 +197,36 @@ function renameItems() {
     )
     console.log(colors.blue(files[0]+" => "+newFilename))
   })
+  
+  console.log("\n")
+}
+
+function finalize() {
+  console.log(colors.underline.white('Finalizing'))
+
+  // Recreate init folder and initialize husky
+  exec('git init "' + path.resolve(__dirname, '..') + '"')
+  console.log(colors.green("Git initialized\n"))
+
+  // Remove post-install command
+  let jsonPackage = path.resolve(__dirname, '..', 'package.json')
+  const pkg = JSON.parse(readFileSync(
+    jsonPackage
+  ) as any)
+
+  delete pkg.scripts.postinstall
+  writeFileSync(
+    jsonPackage,
+    JSON.stringify(pkg, null, 2)
+  )
+  console.log(colors.green("Removed postinstall script\n"))
+
+  fork(
+    path.resolve(__dirname, '..', 'node_modules', 'husky', 'bin', 'install')
+  )
+
+  console.log("\n\n")
+  console.log(colors.green("OK, you're all set. Happy coding!! ;)"))
   
   console.log("\n")
 }
