@@ -131,6 +131,7 @@ const _promptSchemaLibraryName = {
       pattern: /^[a-z]+(\-[a-z]+)*$/,
       type: 'string',
       required: true,
+      message: '"kebab-case" uses lowercase letters, and hyphens instead of spaces',
     },
   },
 }
@@ -142,6 +143,7 @@ const _promptSchemaLibrarySuggest = {
       pattern: /^(y(es)?|n(o)?)$/i,
       type: 'string',
       required: true,
+      message: 'You need to type "Yes" or "No" to continue...',
     },
   },
 }
