@@ -72,7 +72,7 @@ function libraryNameSuggestedAccept() {
       libraryNameCreate()
     }
 
-    if (res.useSuggestedName.toLowerCase() == 'yes') {
+    if (res.useSuggestedName.toLowerCase().charAt(0) == 'y') {
       libraryName = libraryNameSuggested()
       processLibraryProject()
     } else {
@@ -139,7 +139,7 @@ const _promptSchemaLibrarySuggest = {
   properties: {
     useSuggestedName: {
       description: colors.cyan('Would you like it to be called "'+libraryNameSuggested()+'"? [Yes/No]'),
-      pattern: /^(yes|no)$/i,
+      pattern: /^(y(es)?|n(o)?)$/i,
       type: 'string',
       required: true,
     },
