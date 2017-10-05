@@ -31,8 +31,7 @@ let usermail = exec('git config user.email').stdout.trim()
 ///
 
 // These are all relative to the project root directory
-const rmDirs = ['.git']
-const rmFiles = ['tools/init.ts', '.all-contributorsrc', '.gitattributes']
+const rmItems = ['.git/*', 'tools/init.ts', '.all-contributorsrc', '.gitattributes']
 
 
 
@@ -134,13 +133,8 @@ function processLibraryProject() {
 function removeItems() {
   console.log(colors.underline.white('Removed'));
   
-  let dirs = rmDirs.map(f => path.resolve(__dirname, '..', f))
-  rm('-rf', dirs)
-  console.log(colors.red(rmDirs.join("\n")))
-
-  let files = rmFiles.map(f => path.resolve(__dirname, '..', f))
-  rm(files)
-  console.log(colors.red(rmFiles.join("\n")))
+  rm('-rf', rmItems.map(f => path.resolve(__dirname, '..', f)))
+  console.log(colors.red(rmItems.join("\n")))
 }
 
 
