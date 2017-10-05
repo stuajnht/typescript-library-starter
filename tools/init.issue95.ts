@@ -46,6 +46,10 @@ const modifyFiles = [
                       'test/library.test.ts',
                       'tools/gh-pages-publish.ts',
                     ]
+const renameFiles = [
+                      ['src/library.ts', 'src/--libraryname--.ts'],
+                      ['test/library.test.ts', 'test/--libraryname--.test.ts'],
+                    ]
 
 
 
@@ -145,6 +149,8 @@ function processLibraryProject() {
   removeItems()
 
   modifyContents()
+
+  renameItems()
 }
 
 function removeItems() {
@@ -173,6 +179,23 @@ function modifyContents() {
     console.error('Error occurred:', error);
   }
 
+  console.log("\n")
+}
+
+function renameItems() {
+  console.log(colors.underline.white('Renamed'))
+
+  renameFiles.forEach(function(files){
+    // Files[0] is the current filename
+    // Files[1] is the new name
+    let newFilename = files[1].replace(/--libraryname--/g, libraryName)
+    mv(
+      path.resolve(__dirname, '..', files[0]),
+      path.resolve(__dirname, '..', newFilename)
+    )
+    console.log(colors.blue(files[0]+" => "+newFilename))
+  })
+  
   console.log("\n")
 }
 
