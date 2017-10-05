@@ -205,28 +205,25 @@ function finalize() {
   console.log(colors.underline.white('Finalizing'))
 
   // Recreate init folder and initialize husky
-  exec('git init "' + path.resolve(__dirname, '..') + '"')
-  console.log(colors.green("Git initialized\n"))
+  exec('git init "' + path.resolve(__dirname, '..') + '"', {silent:true})
+  console.log(colors.green("Initialized empty Git repository in "+ path.resolve(__dirname, '..', '.git')))
 
   // Remove post-install command
   let jsonPackage = path.resolve(__dirname, '..', 'package.json')
-  const pkg = JSON.parse(readFileSync(
-    jsonPackage
-  ) as any)
+  const pkg = JSON.parse(readFileSync(jsonPackage) as any)
 
   delete pkg.scripts.postinstall
-  writeFileSync(
-    jsonPackage,
-    JSON.stringify(pkg, null, 2)
-  )
-  console.log(colors.green("Removed postinstall script\n"))
+
+  writeFileSync(jsonPackage, JSON.stringify(pkg, null, 2))
+  console.log(colors.green("Postinstall script has been removed"))
 
   fork(
-    path.resolve(__dirname, '..', 'node_modules', 'husky', 'bin', 'install')
+    path.resolve(__dirname, '..', 'node_modules', 'husky', 'bin', 'install'),
+    {silent:true}
   )
+  console.log(colors.green("Git hooks set up"))
 
-  console.log("\n\n")
-  console.log(colors.green("OK, you're all set. Happy coding!! ;)"))
+  console.log(colors.green("\nOK, you're all set. Happy coding!! ;)"))
   
   console.log("\n")
 }
