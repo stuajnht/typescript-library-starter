@@ -31,7 +31,7 @@ let usermail = exec('git config user.email').stdout.trim()
 ///
 
 // These are all relative to the project root directory
-const rmItems = ['.git/*', 'tools/init.ts', '.all-contributorsrc', '.gitattributes']
+const rmItems = ['.git', 'tools/init.ts', '.all-contributorsrc', '.gitattributes']
 const modifyFiles = ['package.json', 'rollup.config.ts', 'LICENSE', 'test/library.test.ts', 'tools/gh-pages-publish.ts']
 
 
@@ -62,6 +62,7 @@ function libraryNameCreate() {
   _prompt.get(_promptSchemaLibraryName, (err: any, res: any) => {
     if (err) {
       console.log(colors.red('Sorry, there was an error building the workspace :('))
+      removeItems()
       process.exit(1)
       return
     }
@@ -126,7 +127,7 @@ function libraryNameSuggestedIsDefault() {
 ///
 
 function processLibraryProject() {
-  console.log(colors.cyan("\nThanks for that. The last few changes are being made... hang tight!\n\n"))
+  console.log(colors.cyan("\nThanks for the info. The last few changes are being made... hang tight!\n\n"))
 
   removeItems()
 
@@ -138,6 +139,8 @@ function removeItems() {
   
   rm('-rf', rmItems.map(f => path.resolve(__dirname, '..', f)))
   console.log(colors.red(rmItems.join("\n")))
+  
+  console.log("\n")
 }
 
 function modifyContents() {
@@ -155,6 +158,8 @@ function modifyContents() {
   catch (error) {
     console.error('Error occurred:', error);
   }
+
+  console.log("\n")
 }
 
 
