@@ -31,8 +31,21 @@ let usermail = exec('git config user.email').stdout.trim()
 ///
 
 // These are all relative to the project root directory
-const rmItems = ['.git', 'tools/init.ts', '.all-contributorsrc', '.gitattributes']
-const modifyFiles = ['package.json', 'rollup.config.ts', 'LICENSE', 'test/library.test.ts', 'tools/gh-pages-publish.ts']
+const rmDirs = [
+                 '.git',
+               ]
+const rmFiles = [
+                  '.all-contributorsrc',
+                  '.gitattributes',
+                  'tools/init.ts',
+                ]
+const modifyFiles = [
+                      'LICENSE',
+                      'package.json',
+                      'rollup.config.ts',
+                      'test/library.test.ts',
+                      'tools/gh-pages-publish.ts',
+                    ]
 
 
 
@@ -137,6 +150,7 @@ function processLibraryProject() {
 function removeItems() {
   console.log(colors.underline.white('Removed'))
   
+  let rmItems = rmDirs.concat(rmFiles)
   rm('-rf', rmItems.map(f => path.resolve(__dirname, '..', f)))
   console.log(colors.red(rmItems.join("\n")))
   
