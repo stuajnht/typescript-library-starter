@@ -153,6 +153,9 @@ function processLibraryProject() {
   renameItems()
 
   finalize()
+  
+  console.log(colors.cyan("\nOK, you're all set. Happy coding!! ;)"))
+  console.log("\n")
 }
 
 function removeItems() {
@@ -195,7 +198,7 @@ function renameItems() {
       path.resolve(__dirname, '..', files[0]),
       path.resolve(__dirname, '..', newFilename)
     )
-    console.log(colors.blue(files[0]+" => "+newFilename))
+    console.log(colors.cyan(files[0]+" => "+newFilename))
   })
   
   console.log("\n")
@@ -222,8 +225,6 @@ function finalize() {
     {silent:true}
   )
   console.log(colors.green("Git hooks set up"))
-
-  console.log(colors.green("\nOK, you're all set. Happy coding!! ;)"))
   
   console.log("\n")
 }
@@ -240,7 +241,7 @@ const _promptSchemaLibraryName = {
       pattern: /^[a-z]+(\-[a-z]+)*$/,
       type: 'string',
       required: true,
-      message: '"kebab-case" uses lowercase letters, and hyphens instead of spaces',
+      message: '"kebab-case" uses lowercase letters, and hyphens for any punctuation',
     },
   },
 }
