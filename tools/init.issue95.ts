@@ -9,12 +9,8 @@ const path = require('path')
 const { readFileSync, writeFileSync } = require('fs')
 const { fork } = require('child_process')
 
-if (!which('git')) {
-  console.log(colors.red('Sorry, this script requires git'))
-  process.exit(1)
-}
 
-// Note: These are all relative to the project root directory
+// Note: These should all be relative to the project root directory
 const rmDirs = [
                  '.git',
                ]
@@ -34,6 +30,63 @@ const renameFiles = [
                       ['src/library.ts', 'src/--libraryname--.ts'],
                       ['test/library.test.ts', 'test/--libraryname--.test.ts'],
                     ]
+
+
+const _promptSchemaLibraryName = {
+  properties: {
+    library: {
+      description: colors.cyan('What do you want the library to be called (use kebab-case)'),
+      pattern: /^[a-z]+(\-[a-z]+)*$/,
+      type: 'string',
+      required: true,
+      message: '"kebab-case" uses lowercase letters, and hyphens for any punctuation',
+    },
+  },
+}
+
+const _promptSchemaLibrarySuggest = {
+  properties: {
+    useSuggestedName: {
+      description: colors.cyan('Would you like it to be called "'+libraryNameSuggested()+'"? [Yes/No]'),
+      pattern: /^(y(es)?|n(o)?)$/i,
+      type: 'string',
+      required: true,
+      message: 'You need to type "Yes" or "No" to continue...',
+    },
+  },
+}
+
+
+
+_prompt.start()
+_prompt.message = ''
+
+// Clear console
+let lines = (process.stdout as any).getWindowSize()[1]
+for (let i = 0; i < lines; i++) {
+  console.log('\r\n')
+}
+
+if (!which('git')) {
+  console.log(colors.red('Sorry, this script requires git'))
+  process.exit(1)
+}
+
+// Say hi!
+console.log(colors.cyan("Hi! You're almost ready to make the next great TypeScript library."))
+
+// Generate the library name and start the tasks
+if (process.env.CI == null) {
+  if (!libraryNameSuggestedIsDefault()) {
+    libraryNameSuggestedAccept()
+  } else {
+    libraryNameCreate()
+  }
+} else {
+  // This is being run in a CI environment, so don't ask any questions
+  setupLibrary(libraryNameSuggested())
+}
+
 
 
 /**
@@ -98,6 +151,7 @@ function libraryNameSuggestedIsDefault() {
 
   return false
 }
+
 
 
 /**
@@ -214,63 +268,4 @@ function finalize() {
   console.log(colors.green('Git hooks set up'))
   
   console.log("\n")
-}
-
-
-
-///
-/// Questions for the user
-///
-const _promptSchemaLibraryName = {
-  properties: {
-    library: {
-      description: colors.cyan('What do you want the library to be called (use kebab-case)'),
-      pattern: /^[a-z]+(\-[a-z]+)*$/,
-      type: 'string',
-      required: true,
-      message: '"kebab-case" uses lowercase letters, and hyphens for any punctuation',
-    },
-  },
-}
-
-const _promptSchemaLibrarySuggest = {
-  properties: {
-    useSuggestedName: {
-      description: colors.cyan('Would you like it to be called "'+libraryNameSuggested()+'"? [Yes/No]'),
-      pattern: /^(y(es)?|n(o)?)$/i,
-      type: 'string',
-      required: true,
-      message: 'You need to type "Yes" or "No" to continue...',
-    },
-  },
-}
-
-
-
-///
-/// Post setup tasks
-///
-
-_prompt.start()
-_prompt.message = ''
-
-// Clear console
-let lines = (process.stdout as any).getWindowSize()[1]
-for (let i = 0; i < lines; i++) {
-  console.log('\r\n')
-}
-
-// Say hi!
-console.log(colors.cyan("Hi! You're almost ready to make the next great TypeScript library."))
-
-// Generate the library name and start the tasks
-if (process.env.CI == null) {
-  if (!libraryNameSuggestedIsDefault()) {
-    libraryNameSuggestedAccept()
-  } else {
-    libraryNameCreate()
-  }
-} else {
-  // This is being run in a CI environment, so don't ask any questions
-  setupLibrary(libraryNameSuggested())
 }
