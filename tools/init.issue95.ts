@@ -17,16 +17,6 @@ if (!which('git')) {
 
 
 ///
-/// Helper variables
-///
-
-let libraryName = 'test' // Default, in case this is running in a CI environment
-let username = exec('git config user.name').stdout.trim()
-let usermail = exec('git config user.email').stdout.trim()
-
-
-
-///
 /// Files / directories to be changed
 ///
 
@@ -54,24 +44,6 @@ const renameFiles = [
 
 
 ///
-/// Helper functions
-///
-
-function resolve(p: any) {
-  return path.resolve(__dirname, '..', p)
-}
-
-function inCI() {
-  if (process.env.CI == null) {
-    return false
-  }
-
-  return true
-}
-
-
-
-///
 /// Library Name functions
 ///
 
@@ -84,8 +56,7 @@ function libraryNameCreate() {
       return
     }
 
-    libraryName = res.library
-    processLibraryProject()
+    processLibraryProject(res.library)
   })
 }
 
@@ -101,8 +72,7 @@ function libraryNameSuggestedAccept() {
     }
 
     if (res.useSuggestedName.toLowerCase().charAt(0) == 'y') {
-      libraryName = libraryNameSuggested()
-      processLibraryProject()
+      processLibraryProject(libraryNameSuggested())
     } else {
       libraryNameCreate()
     }
@@ -143,14 +113,18 @@ function libraryNameSuggestedIsDefault() {
 /// Setup library
 ///
 
-function processLibraryProject() {
+function processLibraryProject(libraryName: string) {
   console.log(colors.cyan("\nThanks for the info. The last few changes are being made... hang tight!\n\n"))
+  
+  // Get the Git username and email before the .git directory is removed
+  let username = exec('git config user.name').stdout.trim()
+  let usermail = exec('git config user.email').stdout.trim()
 
   removeItems()
 
-  modifyContents()
+  modifyContents(libraryName, username, usermail)
 
-  renameItems()
+  renameItems(libraryName)
 
   finalize()
   
@@ -168,7 +142,7 @@ function removeItems() {
   console.log("\n")
 }
 
-function modifyContents() {
+function modifyContents(libraryName: string, username: string, usermail: string) {
   console.log(colors.underline.white('Modified'))
 
   let files = modifyFiles.map(f => path.resolve(__dirname, '..', f))
@@ -187,7 +161,7 @@ function modifyContents() {
   console.log("\n")
 }
 
-function renameItems() {
+function renameItems(libraryName: string) {
   console.log(colors.underline.white('Renamed'))
 
   renameFiles.forEach(function(files){
@@ -278,7 +252,7 @@ for (let i = 0; i < lines; i++) {
 console.log(colors.cyan("Hi! You're almost ready to make the next great TypeScript library."))
 
 // Generate the library name and start the tasks
-if (!inCI()) {
+if (process.env.CI == null) {
   if (!libraryNameSuggestedIsDefault()) {
     libraryNameSuggestedAccept()
   } else {
@@ -286,5 +260,5 @@ if (!inCI()) {
   }
 } else {
   // This is being run in a CI environment, so don't ask any questions
-  processLibraryProject()
+  processLibraryProject(libraryNameSuggested())
 }
