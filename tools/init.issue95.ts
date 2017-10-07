@@ -118,7 +118,7 @@ function libraryNameSuggestedAccept() {
       libraryNameCreate()
     }
 
-    if (res.useSuggestedName.toLowerCase().charAt(0) == 'y') {
+    if (res.useSuggestedName.toLowerCase().charAt(0) === 'y') {
       setupLibrary(libraryNameSuggested())
     } else {
       libraryNameCreate()
@@ -146,7 +146,7 @@ function libraryNameSuggested() {
  * Checks if the suggested library name is the default, which is 'typescript-library-starter'
  */
 function libraryNameSuggestedIsDefault() {
-  if (libraryNameSuggested() == 'typescript-library-starter') {
+  if (libraryNameSuggested() === 'typescript-library-starter') {
     return true
   }
 
