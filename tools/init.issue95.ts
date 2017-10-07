@@ -49,7 +49,7 @@ function libraryNameCreate() {
       return
     }
 
-    processLibraryProject(res.library)
+    setupLibrary(res.library)
   })
 }
 
@@ -65,7 +65,7 @@ function libraryNameSuggestedAccept() {
     }
 
     if (res.useSuggestedName.toLowerCase().charAt(0) == 'y') {
-      processLibraryProject(libraryNameSuggested())
+      setupLibrary(libraryNameSuggested())
     } else {
       libraryNameCreate()
     }
@@ -105,7 +105,7 @@ function libraryNameSuggestedIsDefault() {
  * 
  * @param libraryName
  */
-function processLibraryProject(libraryName: string) {
+function setupLibrary(libraryName: string) {
   console.log(colors.cyan("\nThanks for the info. The last few changes are being made... hang tight!\n\n"))
   
   // Get the Git username and email before the .git directory is removed
@@ -272,5 +272,5 @@ if (process.env.CI == null) {
   }
 } else {
   // This is being run in a CI environment, so don't ask any questions
-  processLibraryProject(libraryNameSuggested())
+  setupLibrary(libraryNameSuggested())
 }
