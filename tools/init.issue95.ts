@@ -35,7 +35,7 @@ const renameFiles = [
 const _promptSchemaLibraryName = {
   properties: {
     library: {
-      description: colors.cyan('What do you want the library to be called (use kebab-case)'),
+      description: colors.cyan('What do you want the library to be called? (use kebab-case)'),
       pattern: /^[a-z]+(\-[a-z]+)*$/,
       type: 'string',
       required: true,
@@ -69,6 +69,7 @@ for (let i = 0; i < lines; i++) {
 
 if (!which('git')) {
   console.log(colors.red('Sorry, this script requires git'))
+  removeItems()
   process.exit(1)
 }
 
@@ -174,7 +175,7 @@ function setupLibrary(libraryName: string) {
 
   finalize()
   
-  console.log(colors.cyan("\nOK, you're all set. Happy coding!! ;)\n"))
+  console.log(colors.cyan("OK, you're all set. Happy coding!! ;)\n"))
 }
 
 /**
@@ -212,7 +213,7 @@ function modifyContents(libraryName: string, username: string, usermail: string)
     console.log(colors.yellow(modifyFiles.join("\n")))
   }
   catch (error) {
-    console.error('Error occurred:', error);
+    console.error('An error occurred modifying the file: ', error)
   }
 
   console.log("\n")
@@ -247,7 +248,10 @@ function finalize() {
   console.log(colors.underline.white('Finalizing'))
 
   // Recreate Git folder
-  let gitInitOutput = exec('git init "' + path.resolve(__dirname, '..') + '"', {silent:true}).stdout
+  let gitInitOutput = exec(
+                            'git init "' + path.resolve(__dirname, '..') + '"',
+                            {silent:true}
+                          ).stdout
   console.log(colors.green(gitInitOutput.replace(/(\n|\r)+/g, '')))
 
   // Remove post-install command
