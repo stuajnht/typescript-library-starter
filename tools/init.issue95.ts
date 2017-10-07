@@ -14,13 +14,7 @@ if (!which('git')) {
   process.exit(1)
 }
 
-
-
-///
-/// Files / directories to be changed
-///
-
-// These are all relative to the project root directory
+// Note: These are all relative to the project root directory
 const rmDirs = [
                  '.git',
                ]
@@ -42,11 +36,10 @@ const renameFiles = [
                     ]
 
 
-
-///
-/// Library Name functions
-///
-
+/**
+ * Asks the user for the name of the library if it has been cloned into the
+ * default directory, or if they want a different name to the one suggested
+ */
 function libraryNameCreate() {
   _prompt.get(_promptSchemaLibraryName, (err: any, res: any) => {
     if (err) {
@@ -84,7 +77,7 @@ function libraryNameSuggestedAccept() {
  * tools parent directory and converting it to kebab-case
  * 
  * The regex for this looks for any non-word or non-digit character, or
- * an underscore (as it's a word character), and replace it with a dash.
+ * an underscore (as it's a word character), and replaces it with a dash.
  * Any leading or trailing dashes are then removed, before the string is
  * lowercased and returned
  */
@@ -96,8 +89,7 @@ function libraryNameSuggested() {
 }
 
 /**
- * This checks if the suggested library name is the default, which
- * is 'typescript-library-starter'
+ * Checks if the suggested library name is the default, which is 'typescript-library-starter'
  */
 function libraryNameSuggestedIsDefault() {
   if (libraryNameSuggested() == 'typescript-library-starter') {
@@ -108,11 +100,11 @@ function libraryNameSuggestedIsDefault() {
 }
 
 
-
-///
-/// Setup library
-///
-
+/**
+ * Calls all of the functions needed to setup the library
+ * 
+ * @param libraryName
+ */
 function processLibraryProject(libraryName: string) {
   console.log(colors.cyan("\nThanks for the info. The last few changes are being made... hang tight!\n\n"))
   
@@ -128,13 +120,17 @@ function processLibraryProject(libraryName: string) {
 
   finalize()
   
-  console.log(colors.cyan("\nOK, you're all set. Happy coding!! ;)"))
-  console.log("\n")
+  console.log(colors.cyan("\nOK, you're all set. Happy coding!! ;)\n"))
 }
 
+/**
+ * Removes items from the project that aren't needed after the initial setup
+ */
 function removeItems() {
   console.log(colors.underline.white('Removed'))
   
+  // The directories and files are combined here, to simplify the function,
+  // as the 'rm' command checks the item type before attempting to remove it
   let rmItems = rmDirs.concat(rmFiles)
   rm('-rf', rmItems.map(f => path.resolve(__dirname, '..', f)))
   console.log(colors.red(rmItems.join("\n")))
@@ -142,6 +138,13 @@ function removeItems() {
   console.log("\n")
 }
 
+/**
+ * Updates the contents of the template files with the library name or user details
+ * 
+ * @param libraryName 
+ * @param username 
+ * @param usermail 
+ */
 function modifyContents(libraryName: string, username: string, usermail: string) {
   console.log(colors.underline.white('Modified'))
 
@@ -161,6 +164,11 @@ function modifyContents(libraryName: string, username: string, usermail: string)
   console.log("\n")
 }
 
+/**
+ * Renames any template files to the new library name
+ * 
+ * @param libraryName 
+ */
 function renameItems(libraryName: string) {
   console.log(colors.underline.white('Renamed'))
 
@@ -172,12 +180,15 @@ function renameItems(libraryName: string) {
       path.resolve(__dirname, '..', files[0]),
       path.resolve(__dirname, '..', newFilename)
     )
-    console.log(colors.cyan(files[0]+" => "+newFilename))
+    console.log(colors.cyan(files[0]+' => '+newFilename))
   })
   
   console.log("\n")
 }
 
+/**
+ * Calls any external programs to finish setting up the library
+ */
 function finalize() {
   console.log(colors.underline.white('Finalizing'))
 
@@ -189,6 +200,7 @@ function finalize() {
   let jsonPackage = path.resolve(__dirname, '..', 'package.json')
   const pkg = JSON.parse(readFileSync(jsonPackage) as any)
 
+  // Note: Add items to remove from the package file here
   delete pkg.scripts.postinstall
 
   writeFileSync(jsonPackage, JSON.stringify(pkg, null, 2))
@@ -199,7 +211,7 @@ function finalize() {
     path.resolve(__dirname, '..', 'node_modules', 'husky', 'bin', 'install'),
     {silent:true}
   )
-  console.log(colors.green("Git hooks set up"))
+  console.log(colors.green('Git hooks set up'))
   
   console.log("\n")
 }
@@ -212,7 +224,7 @@ function finalize() {
 const _promptSchemaLibraryName = {
   properties: {
     library: {
-      description: colors.cyan("What do you want the library to be called (use kebab-case)"),
+      description: colors.cyan('What do you want the library to be called (use kebab-case)'),
       pattern: /^[a-z]+(\-[a-z]+)*$/,
       type: 'string',
       required: true,
